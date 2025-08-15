@@ -19,36 +19,36 @@ export const useAuthStore = create((set) => ({
             set({ isCheckingAuth: false })
         }
     },
-    signup: async (data) => {
+    signup: async (data, navigate) => {
         set({ isSigningUp: true });
         try {
             const res = await axiosInstance.post("auth/signup", data);
             set({ authUser: res.data });
             toast.success("account created successfully");
-
+            if (navigate) navigate('/');
         } catch (error) {
             toast.error(error.response.data.message);
         } finally {
             set({ isSigningUp: false })
         }
     },
-    logout: async () => {
+    logout: async (navigate) => {
         try {
             await axiosInstance.post("auth/logout");
             set({ authUser: null });
             toast.success("loged out successfully");
-
+            if (navigate) navigate('/login');
         } catch (error) {
             toast.error(error.response.data.message);
         } 
     },
-    login: async (data) => {
+    login: async (data, navigate, location) => {
         set({ isLogingIn: true });
         try {
             const res = await axiosInstance.post("auth/login", data);
             set({ authUser: res.data });
             // toast.success("loged in successfully");
-
+            if (navigate && location && location.pathname === '/login') navigate('/');
         } catch (error) {
             toast.error(error.response.data.message);
         } finally {

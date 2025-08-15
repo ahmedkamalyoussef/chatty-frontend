@@ -1,187 +1,138 @@
-import React from 'react'
+import React, { useState } from 'react';
 import { useAuthStore } from '../../store/useAuthStore';
-import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User } from 'lucide-react';
-import { useState } from 'react';
+import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User, User2, UserCircle } from 'lucide-react';
+import Input from '../../components/input/Input';
 import { Link } from 'react-router-dom';
 import AuthImagePattern from '../../components/authImagePattern/AuthImagePattern';
 import toast from 'react-hot-toast';
-
+import { useNavigate } from 'react-router-dom';
 
 function Signup() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [show, setShow] = useState({ password: false, confirmPassword: false });
   const [formData, setFormData] = useState({
-    email: "",
-    firstName: "",
-    lastName: "",
-    handle: "",
-    password: "",
-    confirmPassword: ""
+    email: '',
+    firstName: '',
+    lastName: '',
+    handle: '',
+    password: '',
+    confirmPassword: '',
   });
+  const navigate = useNavigate();
+
   const { signup, isSigningUp } = useAuthStore();
 
-  const validateForm = () => { 
-    if(!formData.firstName.trim()) return toast.error("First Name is required");
-    if(!formData.lastName.trim()) return toast.error("Last Name is required");
-    if(!formData.handle.trim()) return toast.error("Handle is required");
-    if(!formData.email.trim()) return toast.error("Email is required");
-    if(!/\S+@\S+\.\S+/.test(formData.email)) return toast.error("Email is required");
-    if(!formData.password) return toast.error("Password is required");
-    if(formData.password.length < 6) return toast.error("Password at least 6 characters");
-    if(!formData.confirmPassword) return toast.error("Comfirm Password is required");
-    if(formData.confirmPassword !== formData.password) return toast.error("Passwords doesn't match");
+  const toggleShow = (field) => {
+    setShow((prev) => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  const validateForm = () => {
+    if (!formData.firstName.trim()) return toast.error('First Name is required');
+    if (!formData.lastName.trim()) return toast.error('Last Name is required');
+    if (!formData.handle.trim()) return toast.error('Handle is required');
+    if (!formData.email.trim()) return toast.error('Email is required');
+    if (!/\S+@\S+\.\S+/.test(formData.email)) return toast.error('Please enter a valid email');
+    if (!formData.password) return toast.error('Password is required');
+    if (formData.password.length < 6) return toast.error('Password must be at least 6 characters');
+    if (!formData.confirmPassword) return toast.error('Confirm Password is required');
+    if (formData.confirmPassword !== formData.password) return toast.error("Passwords don't match");
 
     return true;
-  }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const success =validateForm();
-    if(success===true) signup(formData);
-  }
+    if (validateForm()) signup(formData,navigate);
+  };
+
+  const fields = [
+    {
+      label: 'First Name',
+      name: 'firstName',
+      placeholder: 'Ahmed',
+      icon: <User className='size-5 text-base-content/40' />,
+      type: 'text',
+    },
+    {
+      label: 'Last Name',
+      name: 'lastName',
+      placeholder: 'Kamal',
+      icon: <User2 className='size-5 text-base-content/40' />,
+      type: 'text',
+    },
+    {
+      label: 'Handle',
+      name: 'handle',
+      placeholder: 'Ahmed123',
+      icon: <UserCircle className='size-5 text-base-content/40' />,
+      type: 'text',
+    },
+    {
+      label: 'Email',
+      name: 'email',
+      placeholder: 'something@example.com',
+      icon: <Mail className='size-5 text-base-content/40' />,
+      type: 'email',
+    },
+    {
+      label: 'Password',
+      name: 'password',
+      placeholder: '******',
+      icon: <Lock className='size-5 text-base-content/40' />,
+      type: show.password ? 'text' : 'password',
+      rightElement: (
+        <button
+          type='button'
+          aria-label='Toggle password visibility'
+          className='absolute inset-y-0 right-0 pr-3 flex items-center'
+          onClick={() => toggleShow('password')}
+        >
+          {show.password ? <EyeOff className='size-5 text-base-content/40' /> : <Eye className='size-5 text-base-content/40' />}
+        </button>
+      ),
+    },
+    {
+      label: 'Confirm Password',
+      name: 'confirmPassword',
+      placeholder: '******',
+      icon: <Lock className='size-5 text-base-content/40' />,
+      type: show.confirmPassword ? 'text' : 'password',
+      rightElement: (
+        <button
+          type='button'
+          aria-label='Toggle confirm password visibility'
+          className='absolute inset-y-0 right-0 pr-3 flex items-center'
+          onClick={() => toggleShow('confirmPassword')}
+        >
+          {show.confirmPassword ? <EyeOff className='size-5 text-base-content/40' /> : <Eye className='size-5 text-base-content/40' />}
+        </button>
+      ),
+    },
+  ];
+
   return (
     <div className='min-h-screen grid lg:grid-cols-2'>
-      <div className="flex flex-col justify-center items-center p-6 sm:p-12">
-        <div className="w-full max-w-md space-y-8">
-          <div className="text-center mb-8">
-            <div className="flex flex-col items-center gap-2 group">
-              <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors mt-6">
+      {/* Left side - Form */}
+      <div className='flex flex-col justify-center items-center p-6 sm:p-12'>
+        <div className='w-full max-w-md space-y-8'>
+          <div className='text-center mb-8'>
+            <div className='flex flex-col items-center gap-2 group'>
+              <div className='size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors mt-6'>
                 <MessageSquare className='size-6 text-primary' />
               </div>
-              <h1 className='text-2xl font-bold mt-0'>Create Account</h1>
-              <p className='text-base-content/60'>Get Started With Your Free Account </p>
+              <h1 className='text-2xl font-bold'>Create Account</h1>
+              <p className='text-base-content/60'>Get Started With Your Free Account</p>
             </div>
           </div>
+
           <form onSubmit={handleSubmit} className='space-y-4'>
-            <div className="form-control">
-              <label className='label'>
-                <span className='label-text font-medium'>First Name</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <User className='size-5 text-base-content/40' />
-                </div>
-                <input
-                  type='text'
-                  className='input input-bordered w-full pl-10'
-                  placeholder='Ahmed'
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                />
-              </div>
-            </div>
-
-
-            <div className="form-control">
-              <label className='label'>
-                <span className='label-text font-medium'>Last Name</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <User className='size-5 text-base-content/40' />
-                </div>
-                <input
-                  type='text'
-                  className='input input-bordered w-full pl-10'
-                  placeholder='Kamal'
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                />
-              </div>
-            </div>
-
-
-            <div className="form-control">
-              <label className='label'>
-                <span className='label-text font-medium'>Handle</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <User className='size-5 text-base-content/40' />
-                </div>
-                <input
-                  type='text'
-                  className='input input-bordered w-full pl-10'
-                  placeholder='Ahmed'
-                  value={formData.handle}
-                  onChange={(e) => setFormData({ ...formData, handle: e.target.value })}
-                />
-              </div>
-            </div>
-
-
-            <div className="form-control">
-              <label className='label'>
-                <span className='label-text font-medium'>Email</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <Mail className='size-5 text-base-content/40' />
-                </div>
-                <input
-                  type='email'
-                  className='input input-bordered w-full pl-10'
-                  placeholder='somthing@example.com'
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-              </div>
-            </div>
-
-
-            <div className="form-control">
-              <label className='label'>
-                <span className='label-text font-medium'>Password</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <Lock className='size-5 text-base-content/40' />
-                </div>
-                <input
-                  type={showPassword ? 'text' : "password"}
-                  className='input input-bordered w-full pl-10'
-                  placeholder='******'
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                />
-                <button type='button'
-                  className='absolute inset-y-0 right-0 pr-3 flex items-center'
-                  onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? (
-                    <EyeOff className='size-5 text-base-content/40' />
-                  ) : (
-                    <Eye className='size-5 text-base-content/40' />
-                  )}
-                </button>
-              </div>
-            </div>
-
-
-            <div className="form-control">
-              <label className='label'>
-                <span className='label-text font-medium'>Confirm Password</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <Lock className='size-5 text-base-content/40' />
-                </div>
-                <input
-                  type={showConfirmPassword ? 'text' : "password"}
-                  className='input input-bordered w-full pl-10'
-                  placeholder='******'
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                />
-                <button type='button'
-                  className='absolute inset-y-0 right-0 pr-3 flex items-center'
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                  {showConfirmPassword ? (
-                    <EyeOff className='size-5 text-base-content/40' />
-                  ) : (
-                    <Eye className='size-5 text-base-content/40' />
-                  )}
-                </button>
-              </div>
-            </div>
+            {fields.map((field) => (
+              <Input
+                key={field.name}
+                {...field}
+                value={formData[field.name]}
+                onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+              />
+            ))}
 
             <button type='submit' className='btn btn-primary w-full' disabled={isSigningUp}>
               {isSigningUp ? (
@@ -190,26 +141,26 @@ function Signup() {
                   Loading...
                 </>
               ) : (
-                "Create Account"
+                'Create Account'
               )}
             </button>
           </form>
-          <div className="text-center">
-            <p className="text-base-content/60">
-              Already have an account? {" "}
-              <Link to='/login' className='link link-primary'>Sign In</Link>
+
+          <div className='text-center'>
+            <p className='text-base-content/60'>
+              Already have an account? <Link to='/login' className='link link-primary'>Sign In</Link>
             </p>
           </div>
         </div>
       </div>
 
-
-      <AuthImagePattern title="Join Our Community"
-      subtitle="Connect with friends, share moments ,and stay in touch with your loved ones."
+      {/* Right side - Image */}
+      <AuthImagePattern
+        title='Join Our Community'
+        subtitle='Connect with friends, share moments, and stay in touch with your loved ones.'
       />
-
     </div>
-  )
+  );
 }
 
-export default Signup
+export default Signup;
