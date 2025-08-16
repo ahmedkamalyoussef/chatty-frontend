@@ -6,7 +6,7 @@ export const useAuthStore = create((set) => ({
     authUser: null,
     isSigningUp: false,
     isLogingIn: false,
-    isUpdatingProfile: false,
+    isUpdatingProfilePic: false,
     isCheckingAuth: true,
     checkAuth: async () => {
         try {
@@ -40,7 +40,7 @@ export const useAuthStore = create((set) => ({
             if (navigate) navigate('/login');
         } catch (error) {
             toast.error(error.response.data.message);
-        } 
+        }
     },
     login: async (data, navigate, location) => {
         set({ isLogingIn: true });
@@ -53,6 +53,18 @@ export const useAuthStore = create((set) => ({
             toast.error(error.response.data.message);
         } finally {
             set({ isLogingIn: false })
+        }
+    },
+    updateProfilePic: async (data) => {
+        set({ isUpdatingProfilePic: true });
+        try {
+            const res = await axiosInstance.patch("auth/update-profile-pic", data);
+            set({ authUser: res.data });
+            toast.success("profile updated successfully");
+        } catch (error) {
+            toast.error(error.response.data.message);
+        } finally {
+            set({ isUpdatingProfilePic: false })
         }
     },
 }))

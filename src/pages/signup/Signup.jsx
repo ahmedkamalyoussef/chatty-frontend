@@ -41,7 +41,7 @@ function Signup() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) signup(formData,navigate);
+    if (validateForm()) signup(formData, navigate);
   };
 
   const fields = [
