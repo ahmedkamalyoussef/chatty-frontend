@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Camera, Mail, User, UserCircle } from 'lucide-react';
 
@@ -13,7 +12,6 @@ function Profile() {
     reader.readAsDataURL(file);
     reader.onload = async () => {
       const base64Image = reader.result;
-      console.log("Uploading image:", base64Image);
       await updateProfilePic({ profilePicture: base64Image });
     };
   };
