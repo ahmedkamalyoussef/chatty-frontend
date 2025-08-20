@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useChatStore } from "../../store/useChatStore";
-import { useAuthStore } from "../../store/useAuthStore";
 import SidebarSkeleton from "./sidebarSkeleton/SidebarSkeleton";
 import { Users } from "lucide-react";
+import { useFriendsStore } from "../../store/useFriendsStore";
 
 const Sidebar = () => {
-  const { getFriends, friends, selectedFriend, setSelectedFriend, isFriendsLoading } = useChatStore();
+  const {  selectedFriend, setSelectedFriend } = useChatStore();
 
-   const { onlineFriends } = useAuthStore();
+   const { onlineFriends,getFriends,friends,isFriendsLoading } = useFriendsStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   useEffect(() => {
     getFriends();

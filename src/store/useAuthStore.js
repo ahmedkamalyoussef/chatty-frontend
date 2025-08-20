@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+import { useFriendsStore } from "./useFriendsStore";
 const SOCKET_URL = "http://localhost:5001";
 
 export const useAuthStore = create((set, get) => ({
@@ -10,7 +11,6 @@ export const useAuthStore = create((set, get) => ({
     isLogingIn: false,
     isUpdatingProfilePic: false,
     isCheckingAuth: true,
-    onlineFriends: [],
     socket: null,
     checkAuth: async () => {
         try {
@@ -87,12 +87,14 @@ export const useAuthStore = create((set, get) => ({
         socket.connect();
         set({ socket });
         socket.on("getOnlineUsers", (userIds) => {
-            set({ onlineFriends: userIds });
+            useFriendsStore.getState().setOnlineFriends(userIds);
         });
+        console.log("connected to socket server");
     },
     disConnectSocket: () => {
         if (!get().socket?.connected) return;
         get().socket.disconnect();
         set({ socket: null });
+        console.log("disconnected from socket server");
     },
 }))
