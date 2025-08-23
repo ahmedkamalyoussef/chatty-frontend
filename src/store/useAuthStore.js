@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import { useFriendsStore } from "./useFriendsStore";
-import { use } from "react";
+import { useChatStore } from "./useChatStore";
 const SOCKET_URL = "http://localhost:5001";
 
 export const useAuthStore = create((set, get) => ({
@@ -98,6 +98,7 @@ export const useAuthStore = create((set, get) => ({
         socket.on("friendRequestAccepted", () => {
             useFriendsStore.getState().getFriends();
         });
+        useChatStore.getState().subscripeToDoingSomething();
         console.log("connected to socket server");
     },
     disConnectSocket: () => {
