@@ -17,15 +17,15 @@ const ChatHeader = () => {
           return { text: "Recording...", color: "text-red-500" };
         default:
           return { 
-            text: onlineFriends.includes(selectedFriend._id) ? "Online" : "Offline",
-            color: onlineFriends.includes(selectedFriend._id) ? "text-green-500" : "text-gray-400"
+            text: onlineFriends.includes(selectedFriend?._id) ? "Online" : "Offline",
+            color: onlineFriends.includes(selectedFriend?._id) ? "text-green-500" : "text-gray-400"
           };
       }
     }
     
     return {
-      text: onlineFriends.includes(selectedFriend._id) ? "Online" : "Offline",
-      color: onlineFriends.includes(selectedFriend._id) ? "text-green-500" : "text-gray-400"
+      text: onlineFriends.includes(selectedFriend?._id) ? "Online" : "Offline",
+      color: onlineFriends.includes(selectedFriend?._id) ? "text-green-500" : "text-gray-400"
     };
   };
 
@@ -39,9 +39,9 @@ const ChatHeader = () => {
           {/* Avatar */}
           <div className="avatar">
             <div className="size-10 rounded-full relative">
-              <img src={selectedFriend.profilePicture} alt={selectedFriend.fullName} />
+              <img src={selectedFriend?.profilePicture} alt={selectedFriend?.fullName} />
               {/* Online indicator */}
-              {onlineFriends.includes(selectedFriend._id) && (
+              {onlineFriends.includes(selectedFriend?._id) && (
                 <span className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-base-100" />
               )}
             </div>
@@ -50,15 +50,15 @@ const ChatHeader = () => {
           {/* User info */}
           <div>
             <h3 className="font-medium">
-              {`${selectedFriend.firstName} ${selectedFriend.lastName}`}
+              {`${selectedFriend?.firstName} ${selectedFriend?.lastName}`}
             </h3>
             <div className="flex items-center gap-1">
               {/* Recording icon */}
               {isRecording && (
                 <Mic className="w-3 h-3 text-red-500 animate-pulse" />
               )}
-              <p className={`text-sm ${statusInfo.color}`}>
-                {statusInfo.text}
+              <p className={`text-sm ${statusInfo?.color}`}>
+                {statusInfo?.text}
               </p>
             </div>
           </div>

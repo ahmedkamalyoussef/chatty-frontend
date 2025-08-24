@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { X, Upload, Check, Users } from 'lucide-react';
 import { useFriendsStore } from '../../store/useFriendsStore';
+import { useGroupsStore } from '../../store/useGroupsStore'; // ✅ جديد
+import toast from 'react-hot-toast';
 
 export const CreateGroupModal = () => {
   const [groupName, setGroupName] = useState('');
@@ -8,13 +10,41 @@ export const CreateGroupModal = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const { friends, onlineFriends } = useFriendsStore();
+  const { createGroup } = useGroupsStore(); // ✅
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setSelectedImage(reader.result);
       reader.readAsDataURL(file);
+      reader.onloadend = async () =>{
+        setSelectedImage(reader.result);
+      } 
+    }
+  };
+
+  const handleCreate = async () => {
+    try {
+      const newGroup = await createGroup({
+        name: groupName.trim(),
+        description: description.trim(),
+        imageBase64: selectedImage,
+        memberIds: selectedMembers,
+      });
+
+      // قفل المودال
+      document.getElementById('create-group-modal')?.close();
+
+      // تفريغ الحالة
+      setGroupName('');
+      setDescription('');
+      setSelectedImage(null);
+      setSelectedMembers([]);
+
+      toast.success("Group created successfully");
+    } catch (e) {
+      // التوست بيتعمل في الستور
     }
   };
 
@@ -96,7 +126,6 @@ export const CreateGroupModal = () => {
                     );
                   }}
                 >
-                  {/* Avatar with Online Indicator */}
                   <div className="relative">
                     <div className="avatar">
                       <div className="w-10 rounded-full">
@@ -111,7 +140,6 @@ export const CreateGroupModal = () => {
                     )}
                   </div>
 
-                  {/* User Info */}
                   <div className="flex-1">
                     <div className="font-medium">
                       {friend.firstName} {friend.lastName}
@@ -121,16 +149,13 @@ export const CreateGroupModal = () => {
                     </div>
                   </div>
 
-                  {/* Selection Checkbox */}
                   <div className={`
                     size-5 rounded-full border-2 flex items-center justify-center
                     ${selectedMembers.includes(friend._id)
                       ? 'border-primary bg-primary text-primary-content'
                       : 'border-base-300'}
                   `}>
-                    {selectedMembers.includes(friend._id) && (
-                      <Check className="size-3" />
-                    )}
+                    {selectedMembers.includes(friend._id) && <Check className="size-3" />}
                   </div>
                 </div>
               ))}
@@ -147,6 +172,7 @@ export const CreateGroupModal = () => {
                 {selectedMembers.length} members selected
               </span>
               <button 
+                onClick={handleCreate}
                 className="btn btn-primary"
                 disabled={!groupName || selectedMembers.length === 0}
               >

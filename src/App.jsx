@@ -12,6 +12,7 @@ import { Loader } from 'lucide-react'
 import { Toaster } from 'react-hot-toast'
 import { useThemeStore } from './store/useThemeStore'
 import { CreateGroupModal } from './components/groups/CreateGroupModal'
+import JoinGroup from './pages/joinGroup/JoinGroup'
 
 function App() {
   const { authUser, checkAuth, checkingAuth } = useAuthStore();
@@ -37,6 +38,7 @@ function App() {
           <Route path='/login' element={!authUser ? <Login /> : <Home />} />
           <Route path='/settings' element={<Settings />} />
           <Route path='/profile' element={authUser ? <Profile /> : <Login />} />
+          <Route path="/join-group/:token" element={<JoinGroup />} />
         </Routes>
       {/* </div> */}
       <CreateGroupModal />

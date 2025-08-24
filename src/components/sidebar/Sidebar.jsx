@@ -3,6 +3,8 @@ import { useChatStore } from "../../store/useChatStore";
 import SidebarSkeleton from "./sidebarSkeleton/SidebarSkeleton";
 import { Users, UserPlus, ChevronRight, ChevronLeft, Mic } from "lucide-react";
 import { useFriendsStore } from "../../store/useFriendsStore";
+import { useGroupsStore } from "../../store/useGroupsStore";
+import { useGroupChatStore } from "../../store/useGroupChatStore";
 
 const Sidebar = () => {
   const { onlineFriends, getFriends, friends, isFriendsLoading } = useFriendsStore();
@@ -12,8 +14,12 @@ const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
+  const { groups, getMyGroups, isLoadingGroups } = useGroupsStore();
+  const { setSelectedGroup } = useGroupChatStore();
+
   useEffect(() => {
     getFriends();
+    getMyGroups();
 
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
@@ -26,7 +32,7 @@ const Sidebar = () => {
     handleResize(); // set initial state
 
     return () => window.removeEventListener('resize', handleResize);
-  }, [getFriends]);
+  }, [getFriends, getMyGroups]);
 
   // Filter friends dynamically
   const filteredFriends = useMemo(() => {
@@ -158,6 +164,48 @@ const Sidebar = () => {
               </button>
             );
           })}
+
+          {(isExpanded || !isMobile) && (
+            <div className="px-4 mt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Users className="size-5" />
+                <span className="font-medium">Groups</span>
+              </div>
+            </div>
+          )}
+
+          <div className="overflow-y-auto w-full pb-3">
+            {groups.map(group => (
+              <button
+                key={group._id}
+                onClick={() => {
+                  setSelectedGroup(group);
+                  if (isMobile) setIsExpanded(false);
+                }}
+                className="w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors"
+              >
+                <div className="relative mx-auto lg:mx-0">
+                  <img
+                    src={group.groupPicture || "https://cdn-icons-png.flaticon.com/512/1946/1946429.png"}
+                    alt={group.name}
+                    className="size-12 object-cover rounded-full"
+                  />
+                </div>
+                {(isExpanded || !isMobile) && (
+                  <div className="text-left min-w-0 flex-1">
+                    <div className="font-medium truncate">{group.name}</div>
+                    <div className="text-sm text-zinc-400">
+                      {group.members?.length || 0} members
+                    </div>
+                  </div>
+                )}
+              </button>
+            ))}
+
+            {groups.length === 0 && !isLoadingGroups && (
+              <div className="text-center text-zinc-500 py-2">No groups yet</div>
+            )}
+          </div>
 
           {filteredFriends.length === 0 && (
             <div className="text-center text-zinc-500 py-4">

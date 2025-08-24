@@ -1,10 +1,13 @@
-import {useChatStore} from '../../store/useChatStore'
-import Sidebar from '../../components/sidebar/Sidebar'
-import NoChatSelected from '../../components/noChatSelected/NoChatSelected'
-import ChatContainer from '../../components/chatContainer/ChatContainer'
+import { useChatStore } from "../../store/useChatStore";
+import { useGroupChatStore } from "../../store/useGroupChatStore";
+import Sidebar from "../../components/sidebar/Sidebar";
+import NoChatSelected from "../../components/noChatSelected/NoChatSelected";
+import ChatContainer from "../../components/chatContainer/ChatContainer";
+import GroupChatContainer from "../../components/groupChatContainer/GroupChatContainer";
 
 function Home() {
-  const { selectedFriend } = useChatStore()
+  const { selectedFriend } = useChatStore();
+  const { selectedGroup } = useGroupChatStore();
 
   return (
     <div className="h-screen bg-base-200">
@@ -13,12 +16,18 @@ function Home() {
           <div className="flex h-full rounded-lg overflow-hidden">
             <Sidebar />
 
-            {!selectedFriend ? <NoChatSelected /> : <ChatContainer />}
+            {!selectedFriend && !selectedGroup ? (
+              <NoChatSelected />
+            ) : selectedFriend ? (
+              <ChatContainer />
+            ) : (
+              <GroupChatContainer />
+            )}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;

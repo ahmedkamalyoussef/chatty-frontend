@@ -5,6 +5,8 @@ import { io } from "socket.io-client";
 import { useFriendsStore } from "./useFriendsStore";
 import { useChatStore } from "./useChatStore";
 const SOCKET_URL = "http://localhost:5001";
+import { useGroupsStore } from "./useGroupsStore";
+import { useGroupChatStore } from "./useGroupChatStore";
 
 export const useAuthStore = create((set, get) => ({
     authUser: null,
@@ -81,9 +83,7 @@ export const useAuthStore = create((set, get) => ({
     connectSocket: () => {
         if (get().socket?.connected || !get().authUser) return;
         const socket = io(SOCKET_URL, {
-            query: {
-                userId: get().authUser._id,
-            },
+            query: { userId: get().authUser._id },
         });
         socket.connect();
         set({ socket });
@@ -99,10 +99,23 @@ export const useAuthStore = create((set, get) => ({
             useFriendsStore.getState().getFriends();
         });
         useChatStore.getState().subscripeToDoingSomething();
+
+        const groups = useGroupsStore.getState().groups;
+        if (groups?.length) {
+            groups.forEach(g => socket.emit("joinGroup", g._id));
+        } else {
+            useGroupsStore.getState().getMyGroups();
+        }
+
+        useGroupChatStore.getState().subscribeToGroupSocket();
+
         console.log("connected to socket server");
     },
+
     disConnectSocket: () => {
         if (!get().socket?.connected) return;
+        useGroupChatStore.getState().unsubscribeFromGroupSocket();
+
         get().socket.disconnect();
         set({ socket: null });
         console.log("disconnected from socket server");
